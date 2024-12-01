@@ -21,10 +21,12 @@ const io = new Server(server, {
 
 io.on('connection', (socket)=>{
 console.log('a user connected', socket.id);
-socket.on('message', (data)=>{
-  console.log(data);
+socket.on('message', ({room, message})=>{
+  room ? io.to(room).emit('recieve-message', message) : io.emit('recieve-message', message);
+ 
 });
-socket.on('disconnect', ()=>{
+
+socket.on('disconnect', () => {
   console.log('user disconnected');
   socket.broadcast.emit('message', `${socket.id} has left the chat`);
 });
