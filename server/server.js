@@ -9,6 +9,8 @@ const app = express();
 
 app.use(cors())
 
+
+
 const server = createServer(app);
 
 const io = new Server(server, {
@@ -19,12 +21,25 @@ const io = new Server(server, {
   }
 })
 
+//socket middleware
+
+let user = true;
+
+io.use((socket, next)=>{
+  if(user) next()
+})
+
 io.on('connection', (socket)=>{
 console.log('a user connected', socket.id);
 socket.on('message', ({room, message})=>{
   room ? io.to(room).emit('recieve-message', message) : io.emit('recieve-message', message);
  
 });
+
+socket.on("join-room", (room) => {
+  socket.join(room);
+  console.log("joined room", room);
+}); 
 
 socket.on('disconnect', () => {
   console.log('user disconnected');
